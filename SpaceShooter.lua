@@ -19,6 +19,8 @@ local queue
 -- 客户端链接
 function MSG.open(fd, msg)
     print("MSG.open")
+    -- 这里将fd投递到框架，否则框架不会处理到这个fd
+    socketdriver.start(fd)
 end
 
 function MSG.close(fd)
