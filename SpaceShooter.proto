@@ -1,0 +1,17 @@
+syntax = "proto3";
+package ns;
+
+message AddScore {
+    uint32 userid = 1;
+    uint32 score = 2;
+}
+
+message ReqRank {
+
+    message data{
+        uint32 userid = 1;
+        uint32 score = 2;
+    }
+    
+    repeated date ranklist = 1;
+}
