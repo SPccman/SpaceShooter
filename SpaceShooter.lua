@@ -5,6 +5,13 @@
 local skynet = require "skynet"
 local socketdriver = require "skynet.socketdriver"
 local netpack = require "skynet.netpack"
+local protobuf = require "protobuf"
+
+-- proto
+local function load_protofile(pbfile)
+    protobuf.register_file(pbfile)
+    print(string.format("注册proto文件: %s", pbfile))
+end
 
 --链接管理
 local connection = {}
@@ -27,10 +34,16 @@ function MSG.close(fd)
     print("MSG.close")
 end
 
+
 -- 处理请求
-function MSG.MsgParser(msg)
-    print("MSG.MsgParser")
+function MsgParser(fd, msg, sz)
+    print(string.format("MSG.MsgParser fd(%d) msg(%s) sz(%d)", fd, msg, sz))
+    local message = netpack.tostring(msg, sz)
+    local data = protobuf.decode("ns.AddScore", message)
+    print(string.format("recv msg uid(%d) score(%d)", data.userid, data.score))
 end
+
+MSG.data = MsgParser
 
 -- 注册消息
 
@@ -42,6 +55,7 @@ skynet.register_protocol {
         return netpack.filter(queue, msg, sz) 
     end,
     dispatch = function(_, _, q, type, ...)   --分发函数
+        print(type)
         if type then
             MSG[type](...)
         end 
@@ -61,6 +75,7 @@ function InitServer()
     print(string.format("Listen on (%s) port (%d)", address, port))
     socket = socketdriver.listen(address, port)
     socketdriver.start(socket)
+    load_protofile("./SpaceShooter.pb")
 end
 
 local function AddUserScore(uid, score)
