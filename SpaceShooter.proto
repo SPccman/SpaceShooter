@@ -1,17 +1,25 @@
 syntax = "proto3";
 package ns;
 
+//msgname 消息的名称,用来区分消息,每个消息都需要有这个字段
+
+message Base {
+    bytes msgname = 1;
+}
+
 message AddScore {
-    uint32 userid = 1;
-    uint32 score = 2;
+    bytes msgname = 1;
+    uint32 userid = 2;
+    uint32 score = 3;
 }
 
 message ReqRank {
+    bytes msgname = 1;
 
     message data{
         uint32 userid = 1;
         uint32 score = 2;
     }
     
-    repeated date ranklist = 1;
+    repeated data ranklist = 2;
 }

@@ -108,12 +108,15 @@ local function notify_addscore(score)
     strbuf = protobuf.encode(
         "ns.AddScore",
         {
+            msgname ="AddScore",
             userid = 123456,
             score = 10,
         }
     )
 
     --send
+    -- ">" 设为大端模式 
+    -- "s[n]" n字节长的无符号整数+字符串
 	local package = string.pack(">s2", strbuf)
 	socket.send(fd, package)
 end

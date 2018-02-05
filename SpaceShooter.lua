@@ -1,4 +1,4 @@
--- 用户登陆
+-- 用户登陆,使用第三方登陆 QQ wechat
 -- 更新分数
 -- 拉取榜单
 
@@ -19,6 +19,12 @@ local connection = {}
 -- 通信消息
 local MSG = {}
 
+-- proto消息处理函数
+local datacmd = {}
+
+-- 用户管理
+local usermanager = {}
+
 local queue
 
 -- open close data 等都与netpack中对应了 代码在 lua-netpack.c +480
@@ -34,16 +40,40 @@ function MSG.close(fd)
     print("MSG.close")
 end
 
-
--- 处理请求
-function MsgParser(fd, msg, sz)
-    print(string.format("MSG.MsgParser fd(%d) msg(%s) sz(%d)", fd, msg, sz))
-    local message = netpack.tostring(msg, sz)
+--------命令处理------------------------------------------------
+function datacmd.AddScore(message)
     local data = protobuf.decode("ns.AddScore", message)
-    print(string.format("recv msg uid(%d) score(%d)", data.userid, data.score))
+
+    local uid = data.userid
+    local score = data.score
+
+    if usermanager[uid] then
+        usermanager[uid] = usermanager[uid] + score;
+        print("user: ", uid, ", curcore: ", usermanager[uid])
+    else
+        usermanager[uid] = score;
+        print("user: ", uid, ", curcore: ", usermanager[uid])
+    end
 end
 
-MSG.data = MsgParser
+--------命令处理------------------------------------------------
+
+function MSG.data(fd, msg, sz)
+    print(string.format("MSG.MsgParser fd(%d) msg(%s) sz(%d)", fd, msg, sz))
+
+    -- 解包
+    local message = netpack.tostring(msg, sz)
+    -- 反序列化
+    local data = protobuf.decode("ns.Base", message)
+
+    print(string.format("recv msg msgname(%s)", data.msgname))
+
+    -- 根据消息名字投递到相应函数
+    local f = datacmd[data.msgname]
+    if f then
+        f(message)  
+    end
+end
 
 -- 注册消息
 
@@ -78,8 +108,7 @@ function InitServer()
     load_protofile("./SpaceShooter.pb")
 end
 
-local function AddUserScore(uid, score)
-end
+
 
 local function GetRank()
 end
