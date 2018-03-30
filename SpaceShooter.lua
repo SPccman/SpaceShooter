@@ -56,6 +56,12 @@ function datacmd.AddScore(message)
     end
 end
 
+function datacmd.Login(message)
+end
+
+function datacmd.ReqRank(message)
+end
+
 --------命令处理------------------------------------------------
 
 function MSG.data(fd, msg, sz)
@@ -84,6 +90,7 @@ skynet.register_protocol {
     unpack =  function(msg, sz)    -- 解包函数
         return netpack.filter(queue, msg, sz) 
     end,
+    -- 参数 (session/*类似callbackid*/, source/*源*/, )
     dispatch = function(_, _, q, type, ...)   --分发函数
         print(type)
         if type then
