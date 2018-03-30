@@ -7,9 +7,26 @@ message Base {
     bytes msgname = 1;
 }
 
-message AddScore {
+//登录
+message Login {
+    bytes msgname = 1;
+    /*uint32 userid = 2;*/  //登录成功后服务器返回给用户的
+    bytes token = 3;
+    uint32 type = 4;    //登陆类型 QQ,wechat..
+}
+
+//登陆返回
+message RtnLogin {
     bytes msgname = 1;
     uint32 userid = 2;
+    bytes token = 3;
+    uint32 type = 4;
+    uint32 retcode = 5;
+}
+
+message AddScore {
+    bytes msgname = 1;
+    /*uint32 userid = 2;*/
     uint32 score = 3;
 }
 
