@@ -92,6 +92,9 @@ function dispatch_msg(fd, msg, sz)
 
     else
         -- 没找到则新建 agent
+        -- 这个消息应该是登陆消息
+        -- 解析获得账号信息
+
         login_handler(fd, account)
     end
 end
