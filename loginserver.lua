@@ -1,4 +1,5 @@
 local skynet = require "skynet" 
+-- socket 消息由下面的 socket 模块接管
 local socket = require "socket"
 
 
@@ -7,6 +8,10 @@ local CMD  = {}
 
 -- 连接管理
 local connection = {}
+
+-- 临时会话ID
+local session_id = 1;
+local saved_session = {};
 
 function read(fd, size)
     return socket.read(fd, size) or error()
@@ -41,13 +46,22 @@ function auth(fd, addr)
 
     -- 是否为登陆消息
     if rev.msgname == "login" then
-        -- 新建 agent
-        
+        savesession(account); 
+
+        -- 返回客户端
     else
         close(fd)
     end
 
 end
+
+function savesession(account)
+    session = session_id;
+    session_id = session_id +1;
+    saved_session[session] = {account=account}
+end
+
+
 
 -- 初始化
 -- conf loginserver的配置
@@ -65,3 +79,8 @@ function CMD.open(conf)
     end) 
 end
 
+function CMD.verify(session, secret)
+    local t = saved_session[session] or error()
+    assert(secret == t.token)
+    return t.account
+end
